@@ -15,6 +15,10 @@ exports.handler = async (event) => {
     }
 
     try {
+        // Check if event.body is present and parseable
+        if (!event.body) {
+            throw new Error('Request body is empty');
+        }
         const data = JSON.parse(event.body);
         const { planId, shippingFee, shippingLocation } = data;
 
@@ -54,14 +58,14 @@ exports.handler = async (event) => {
             body: JSON.stringify({ url: session.url })
         };
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         return {
             statusCode: 500,
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type'
             },
-            body: JSON.stringify({ error: 'Failed to create checkout session' })
+            body: JSON.stringify({ error: error.message || 'Failed to create checkout session' })
         };
     }
 };
