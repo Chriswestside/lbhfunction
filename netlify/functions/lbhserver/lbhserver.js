@@ -56,8 +56,8 @@ exports.handler = async (event) => {
                 }
             ],
             mode: 'payment',
-            success_url: 'https://yourdomain.com/success',
-            cancel_url: 'https://yourdomain.com/cancel'
+            success_url: 'https://little-big-hope-2971af-688db640ffff8f55.webflow.io/thank-you',
+            cancel_url: 'https://little-big-hope-2971af-688db640ffff8f55.webflow.io/access-denied'
         });
 
         return {
