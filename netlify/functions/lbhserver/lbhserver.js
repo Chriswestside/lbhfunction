@@ -1,13 +1,25 @@
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 exports.handler = async (event) => {
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    // Set up CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*', // Allow all origins for testing
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     };
 
-    // Check if event body is present
+    // Handle preflight requests for CORS
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 204, // No Content
+            headers
+        };
+    }
+
+    console.log('Event:', event);
+
     if (!event.body) {
+        console.error('Request body is missing');
         return {
             statusCode: 400,
             headers,
@@ -17,8 +29,9 @@ exports.handler = async (event) => {
 
     let body;
     try {
-        body = JSON.parse(event.body); // Try parsing the body
+        body = JSON.parse(event.body);
     } catch (error) {
+        console.error('Invalid JSON input:', error.message);
         return {
             statusCode: 400,
             headers,
@@ -53,6 +66,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
+        console.error('Stripe error:', error.message);
         return {
             statusCode: 500,
             headers,
