@@ -1,13 +1,35 @@
-// Import necessary modules
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 exports.handler = async (event) => {
-    // Parse the request data
-    const { basePrice, shippingFee } = JSON.parse(event.body);
-    const totalAmount = (basePrice + shippingFee) * 100; // Convert to cents for Stripe
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
+
+    // Check if event body is present
+    if (!event.body) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Request body is missing' })
+        };
+    }
+
+    let body;
+    try {
+        body = JSON.parse(event.body); // Try parsing the body
+    } catch (error) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Invalid JSON input' })
+        };
+    }
+
+    const { basePrice, shippingFee } = body;
+    const totalAmount = (basePrice + shippingFee) * 100; // Convert to cents
 
     try {
-        // Create a Stripe checkout session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [
@@ -25,15 +47,15 @@ exports.handler = async (event) => {
             cancel_url: 'https://yourdomain.com/cancel'
         });
 
-        // Return the session ID as JSON
         return {
             statusCode: 200,
+            headers,
             body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
-        // Return an error response
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({ error: error.message })
         };
     }
