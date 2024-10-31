@@ -1,21 +1,32 @@
 exports.handler = async (event) => {
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-    // Add CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
     };
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    // Check if event body is present
+    if (!event.body) {
         return {
-            statusCode: 500,
+            statusCode: 400,
             headers,
-            body: JSON.stringify({ error: 'Stripe API key not set.' })
+            body: JSON.stringify({ error: 'Request body is missing' })
         };
     }
 
-    const { basePrice, shippingFee } = JSON.parse(event.body);
+    let body;
+    try {
+        body = JSON.parse(event.body); // Try parsing the body
+    } catch (error) {
+        return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Invalid JSON input' })
+        };
+    }
+
+    const { basePrice, shippingFee } = body;
     const totalAmount = (basePrice + shippingFee) * 100; // Convert to cents
 
     try {
