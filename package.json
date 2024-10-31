@@ -24,6 +24,7 @@
     "marked-shiki": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "stripe": "^17.3.0",
     "tailwindcss": "^3.4.3",
     "unique-names-generator": "^4.7.1"
   },
@@ -31,5 +32,18 @@
     "@types/blobshape": "^1.0.3",
     "@types/node": "^20.12.7",
     "daisyui": "^4.10.2"
-  }
+  },
+  "description": "[Live Demo](https://astro-platform-starter.netlify.app/)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chriswestside/lbhfunction.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chriswestside/lbhfunction/issues"
+  },
+  "homepage": "https://github.com/Chriswestside/lbhfunction#readme"
 }
