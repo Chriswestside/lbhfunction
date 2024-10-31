@@ -1,9 +1,16 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 exports.handler = async (event) => {
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+    // Add CORS headers
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    };
+
     if (!process.env.STRIPE_SECRET_KEY) {
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({ error: 'Stripe API key not set.' })
         };
     }
@@ -31,11 +38,13 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
+            headers,
             body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({ error: error.message })
         };
     }
