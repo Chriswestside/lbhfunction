@@ -206,7 +206,7 @@ exports.handler = async function (event, context) {
             },
             shipping_options: [{ shipping_rate: shippingRate }],
             success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
-            cancel_url: `${process.env.YOUR_DOMAIN}/access-denied`
+            cancel_url: `${process.env.YOUR_DOMAIN}/produkte`
         });
 
         console.log('Session created:', session);
