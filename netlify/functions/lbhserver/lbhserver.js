@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async function (event, context) {
     console.log('Request received:', event);
@@ -56,7 +56,7 @@ exports.handler = async function (event, context) {
                 allowed_countries: Object.keys(shippingRates) // Allow listed countries for shipping
             },
             shipping_options: [{ shipping_rate: shippingRate }],
-            success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
+            success_url: `${process.env.YOUR_DOMAIN}/registrieren`,
             cancel_url: `${process.env.YOUR_DOMAIN}/produkte`
         });
 
