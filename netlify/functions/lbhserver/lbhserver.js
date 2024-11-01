@@ -1,6 +1,6 @@
 // netlify/functions/create-checkout-session.js
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use your Stripe secret key
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async function (event, context) {
     // Handle CORS preflight request
@@ -19,14 +19,25 @@ exports.handler = async function (event, context) {
     try {
         const { line_items, customer_country } = JSON.parse(event.body);
 
+        // Check for missing or undefined fields
+        if (!line_items || !customer_country) {
+            return {
+                statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ error: 'Missing line_items or customer_country in request body' })
+            };
+        }
+
         // Determine shipping rate based on country
         let shippingRate;
         if (customer_country === 'AT') {
-            shippingRate = 'austria_shipping_rate_id'; // Replace with the ID of your Austria shipping rate
+            shippingRate = 'austria_shipping_rate_id'; // Replace with Austria shipping rate ID
         } else if (['BE', 'FR', 'DE'].includes(customer_country)) {
-            shippingRate = 'europe_shipping_rate_id'; // Replace with the ID of your Europe shipping rate
+            shippingRate = 'europe_shipping_rate_id'; // Replace with Europe shipping rate ID
         } else {
-            shippingRate = 'worldwide_shipping_rate_id'; // Replace with the ID of your Worldwide shipping rate
+            shippingRate = 'worldwide_shipping_rate_id'; // Replace with Worldwide shipping rate ID
         }
 
         // Create the checkout session
@@ -45,15 +56,16 @@ exports.handler = async function (event, context) {
         return {
             statusCode: 200,
             headers: {
-                'Access-Control-Allow-Origin': '*' // Allow all origins (or specify your Webflow domain)
+                'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
+        console.error('Error in create-checkout-session:', error);
         return {
             statusCode: 500,
             headers: {
-                'Access-Control-Allow-Origin': '*' // Allow all origins (or specify your Webflow domain)
+                'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({ error: error.message })
         };
