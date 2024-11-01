@@ -33,11 +33,11 @@ exports.handler = async function (event, context) {
         // Determine shipping rate based on country
         let shippingRate;
         if (customer_country === 'AT') {
-            shippingRate = 'austria_shipping_rate_id'; // Replace with Austria shipping rate ID
+            shippingRate = 'shr_1QAJLqJRMXFic4sWtc3599Cv'; // Replace with Austria shipping rate ID
         } else if (['BE', 'FR', 'DE'].includes(customer_country)) {
-            shippingRate = 'europe_shipping_rate_id'; // Replace with Europe shipping rate ID
+            shippingRate = 'shr_1QAJLqJRMXFic4sWtc3599Cv'; // Replace with Europe shipping rate ID
         } else {
-            shippingRate = 'worldwide_shipping_rate_id'; // Replace with Worldwide shipping rate ID
+            shippingRate = 'shr_1QAJYTJRMXFic4sWxkWKithZ'; // Replace with Worldwide shipping rate ID
         }
 
         // Create the checkout session
