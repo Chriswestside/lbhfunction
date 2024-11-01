@@ -56,7 +56,7 @@ exports.handler = async function (event, context) {
                 allowed_countries: Object.keys(shippingRates) // Allow listed countries for shipping
             },
             shipping_options: [{ shipping_rate: shippingRate }],
-            success_url: `${process.env.YOUR_DOMAIN}/registrieren`,
+            success_url: `${process.env.YOUR_DOMAIN}/registrieren-bundle`,
             cancel_url: `${process.env.YOUR_DOMAIN}/produkte`
         });
 
