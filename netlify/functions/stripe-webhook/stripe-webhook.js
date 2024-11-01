@@ -1,26 +1,27 @@
-// Docs on event and context https://docs.netlify.com/functions/build/#code-your-function-2
+// Import `fetch` to make API requests
+const fetch = require('node-fetch');
+
+// Handler function required by Netlify
 const handler = async (event) => {
     try {
-        const subject = event.queryStringParameters.name || 'World';
+        // Get email from query string or default (for testing)
+        const email = event.queryStringParameters.email || 'test@example.com';
+
+        // Fetch user language preference using helper function
+        const language = await getUserLanguage(email);
+
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: `Hello ${subject}` })
-            // // more keys you can return:
-            // headers: { "headerName": "headerValue", ... },
-            // isBase64Encoded: true,
+            body: JSON.stringify({ message: `Preferred language for ${email} is ${language}` })
         };
     } catch (error) {
-        return { statusCode: 500, body: error.toString() };
+        return { statusCode: 500, body: JSON.stringify({ error: error.toString() }) };
     }
 };
 
-module.exports = { handler };
-
-const fetch = require('node-fetch');
-
+// Helper function to fetch user language from Memberstack
 async function getUserLanguage(email) {
-    // Replace with your Memberstack API key
-    const MEMBERSTACK_API_KEY = 'pk_sb_9b4f0e1658364da15471';
+    const MEMBERSTACK_API_KEY = process.env.MEMBERSTACK_API_KEY; // Use environment variable
 
     // Memberstack API endpoint to fetch members by email
     const endpoint = `https://api.memberstack.com/v2/members?email=${encodeURIComponent(email)}`;
@@ -40,13 +41,10 @@ async function getUserLanguage(email) {
 
         const data = await response.json();
 
-        // Check if the user was found
+        // Check if the user was found and return language or default to 'en'
         if (data && data.data && data.data.length > 0) {
             const user = data.data[0];
-
-            // Assume you have a custom field named "language" in Memberstack
-            // that stores the user's preferred language code (e.g., "en", "es", etc.)
-            return user.fields.language || 'en'; // Default to English if no preference is found
+            return user.fields.language || 'en'; // Default to English if no language is found
         } else {
             console.warn(`No user found with email: ${email}`);
             return 'en'; // Default to English if user not found
@@ -56,3 +54,6 @@ async function getUserLanguage(email) {
         return 'en'; // Default to English if there's an error
     }
 }
+
+// Export the handler as required by Netlify Functions
+module.exports = { handler };
