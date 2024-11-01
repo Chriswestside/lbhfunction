@@ -15,6 +15,7 @@ const handler = async (event) => {
             body: JSON.stringify({ message: `Preferred language for ${email} is ${language}` })
         };
     } catch (error) {
+        console.error('Error in handler function:', error);
         return { statusCode: 500, body: JSON.stringify({ error: error.toString() }) };
     }
 };
@@ -25,10 +26,13 @@ async function getUserLanguage(email) {
 
     // Memberstack API endpoint to fetch members by email
     const endpoint = `https://api.memberstack.com/v2/members?email=${encodeURIComponent(email)}`;
-    if (!process.env.MEMBERSTACK_API_KEY) {
+
+    // Log to check if the environment variable is present
+    if (!MEMBERSTACK_API_KEY) {
         console.error('API key is missing in environment variables');
         return 'en'; // Default if missing
     }
+
     try {
         const response = await fetch(endpoint, {
             method: 'GET',
@@ -37,6 +41,9 @@ async function getUserLanguage(email) {
                 'Content-Type': 'application/json'
             }
         });
+
+        // Log the response status to help troubleshoot
+        console.log(`Fetch status: ${response.status}`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch user data: ${response.statusText}`);
@@ -47,6 +54,7 @@ async function getUserLanguage(email) {
         // Check if the user was found and return language or default to 'en'
         if (data && data.data && data.data.length > 0) {
             const user = data.data[0];
+            console.log(`User found: ${user}`);
             return user.fields.language || 'en'; // Default to English if no language is found
         } else {
             console.warn(`No user found with email: ${email}`);
