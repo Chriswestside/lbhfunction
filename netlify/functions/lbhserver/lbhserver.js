@@ -179,7 +179,7 @@ exports.handler = async function (event, context) {
         // Define shipping rates based on countries
         let shippingRate;
         const shippingRates = {
-            AT: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
+            AT: 'shr_1QGR7oJRMXFic4sW1cy9tYUQ',
             BE: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
             FR: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
             DE: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
