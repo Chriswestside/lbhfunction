@@ -1,82 +1,42 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// netlify/functions/create-checkout-session.js
 
-exports.handler = async (event) => {
-    console.log('Received event:', event);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use your Stripe secret key
 
-    if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
-            },
-            body: 'OK'
-        };
-    }
-
+exports.handler = async function (event, context) {
     try {
-        if (!event.body) {
-            console.log('No body found in the event.');
-            throw new Error('Request body is empty');
+        const { line_items, customer_country } = JSON.parse(event.body);
+
+        // Determine shipping rate based on country
+        let shippingRate;
+        if (customer_country === 'AT') {
+            shippingRate = 'austria_shipping_rate_id'; // Replace with the ID of your Austria shipping rate
+        } else if (['BE', 'FR', 'DE'].includes(customer_country)) {
+            shippingRate = 'europe_shipping_rate_id'; // Replace with the ID of your Europe shipping rate
+        } else {
+            shippingRate = 'worldwide_shipping_rate_id'; // Replace with the ID of your Worldwide shipping rate
         }
 
-        const data = JSON.parse(event.body);
-        console.log('Parsed data:', data);
-
-        const { planId, shippingFee, shippingLocation } = data;
-
-        // Validate presence of required fields
-        if (!planId || !shippingFee || !shippingLocation) {
-            throw new Error('Missing required fields: planId, shippingFee, or shippingLocation');
-        }
-
-        const productPrice = await stripe.prices.retrieve(planId);
-        console.log('Product price retrieved:', productPrice);
-
-        const totalAmount = productPrice.unit_amount + shippingFee * 100;
-
+        // Create the checkout session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
-            line_items: [
-                {
-                    price: planId,
-                    quantity: 1
-                }
-            ],
-            shipping_options: [
-                {
-                    shipping_rate_data: {
-                        type: 'fixed_amount',
-                        fixed_amount: { amount: shippingFee * 100, currency: 'eur' },
-                        display_name: `${shippingLocation} Shipping`
-                    }
-                }
-            ],
+            line_items: line_items,
             mode: 'payment',
-            success_url: 'https://your-site.com/success',
-            cancel_url: 'https://your-site.com/cancel'
+            shipping_address_collection: {
+                allowed_countries: ['AT', 'BE', 'FR', 'DE', 'US', 'CA', 'GB', 'AU'] // Add relevant countries
+            },
+            shipping_options: [{ shipping_rate: shippingRate }],
+            success_url: `${process.env.YOUR_DOMAIN}/success`,
+            cancel_url: `${process.env.YOUR_DOMAIN}/cancel`
         });
-
-        console.log('Session created successfully:', session.url);
 
         return {
             statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
-            body: JSON.stringify({ url: session.url })
+            body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
-        console.error('Error in Netlify function:', error.message);
         return {
             statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
-            body: JSON.stringify({ error: error.message || 'Failed to create checkout session' })
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
