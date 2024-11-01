@@ -205,8 +205,8 @@ exports.handler = async function (event, context) {
                 allowed_countries: Object.keys(shippingRates) // Allow listed countries for shipping
             },
             shipping_options: [{ shipping_rate: shippingRate }],
-            success_url: `${process.env.YOUR_DOMAIN}/success`,
-            cancel_url: `${process.env.YOUR_DOMAIN}/cancel`
+            success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
+            cancel_url: `${process.env.YOUR_DOMAIN}/access-denied`
         });
 
         console.log('Session created:', session);
