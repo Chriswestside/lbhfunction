@@ -32,11 +32,11 @@ exports.handler = async function (event, context) {
 
         let shippingRate;
         if (customer_country === 'AT') {
-            shippingRate = 'price_1QG18pJRMXFic4sW6eEFa9tG'; // Replace with Austria rate ID
+            shippingRate = 'shr_1QAJLqJRMXFic4sWtc3599Cv'; // Replace with Austria rate ID
         } else if (['BE', 'FR', 'DE'].includes(customer_country)) {
-            shippingRate = 'price_1QG18pJRMXFic4sW6eEFa9tG'; // Replace with Europe rate ID
+            shippingRate = 'shr_1QAJLqJRMXFic4sWtc3599Cv'; // Replace with Europe rate ID
         } else {
-            shippingRate = 'price_1QG199JRMXFic4sWfVtu7XSP'; // Replace with Worldwide rate ID
+            shippingRate = 'shr_1QAJYTJRMXFic4sWxkWKithZ'; // Replace with Worldwide rate ID
         }
 
         const session = await stripe.checkout.sessions.create({
