@@ -25,7 +25,10 @@ async function getUserLanguage(email) {
 
     // Memberstack API endpoint to fetch members by email
     const endpoint = `https://api.memberstack.com/v2/members?email=${encodeURIComponent(email)}`;
-
+    if (!process.env.MEMBERSTACK_API_KEY) {
+        console.error('API key is missing in environment variables');
+        return 'en'; // Default if missing
+    }
     try {
         const response = await fetch(endpoint, {
             method: 'GET',
