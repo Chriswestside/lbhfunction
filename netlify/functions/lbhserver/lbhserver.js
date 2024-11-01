@@ -3,6 +3,19 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use your Stripe secret key
 
 exports.handler = async function (event, context) {
+    // Handle CORS preflight request
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Allow all origins (or specify your Webflow domain)
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+            },
+            body: 'OK'
+        };
+    }
+
     try {
         const { line_items, customer_country } = JSON.parse(event.body);
 
@@ -31,11 +44,17 @@ exports.handler = async function (event, context) {
 
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*' // Allow all origins (or specify your Webflow domain)
+            },
             body: JSON.stringify({ id: session.id })
         };
     } catch (error) {
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*' // Allow all origins (or specify your Webflow domain)
+            },
             body: JSON.stringify({ error: error.message })
         };
     }
