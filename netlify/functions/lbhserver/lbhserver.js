@@ -50,17 +50,17 @@ exports.handler = async function (event, context) {
         console.log('Customer country:', customer_country);
         console.log('Selected shipping rate ID:', shippingRate);
 
-        // Create Stripe Checkout session
+        // Create Stripe Checkout session with the selected shipping rate
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: line_items,
             mode: 'payment',
             shipping_address_collection: {
-                allowed_countries: Object.keys(shippingRates) // Only allow countries in the shipping rates list
+                allowed_countries: [customer_country] // Only allow the selected country
             },
-            shipping_options: [{ shipping_rate: shippingRate }],
-            success_url: `${process.env.YOUR_DOMAIN}/vielen-dank-email`,
-            cancel_url: `${process.env.YOUR_DOMAIN}/produkte`
+            shipping_options: [{ shipping_rate: shippingRate }], // Only one shipping option for the selected country
+            success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
+            cancel_url: `${process.env.YOUR_DOMAIN}/products`
         });
 
         console.log('Session created:', session);
