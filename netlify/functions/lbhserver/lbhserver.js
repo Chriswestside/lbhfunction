@@ -1,4 +1,4 @@
-stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async function (event, context) {
     console.log('Request received:', event);
@@ -27,33 +27,36 @@ exports.handler = async function (event, context) {
                 body: JSON.stringify({ error: 'Missing line_items or customer_country in request body' })
             };
         }
+
         // Define shipping rates based on countries
-        let shippingRate;
         const shippingRates = {
-            AT: 'shr_1QGR7oJRMXFic4sW1cy9tYUQ',
-            BE: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
-            FR: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
-            DE: 'shr_1QAJLqJRMXFic4sWtc3599Cv',
-            // Define worldwide shipping rates based on countries
-            US: 'shr_1QAJYTJRMXFic4sWxkWKithZ',
-            CA: 'shr_1QAJYTJRMXFic4sWxkWKithZ',
-            GB: 'shr_1QAJYTJRMXFic4sWxkWKithZ',
-            AU: 'shr_1QAJYTJRMXFic4sWxkWKithZ'
+            AT: 'shr_1QGR7oJRMXFic4sW1cy9tYUQ', // Austria shipping rate ID
+            BE: 'shr_1QAJLqJRMXFic4sWtc3599Cv', // Belgium shipping rate ID
+            FR: 'shr_1QAJLqJRMXFic4sWtc3599Cv', // France shipping rate ID
+            DE: 'shr_1QAJLqJRMXFic4sWtc3599Cv', // Germany shipping rate ID
+            US: 'shr_1QAJYTJRMXFic4sWxkWKithZ', // United States shipping rate ID
+            CA: 'shr_1QAJYTJRMXFic4sWxkWKithZ', // Canada shipping rate ID
+            GB: 'shr_1QAJYTJRMXFic4sWxkWKithZ', // United Kingdom shipping rate ID
+            AU: 'shr_1QAJYTJRMXFic4sWxkWKithZ' // Australia shipping rate ID
         };
 
-        // Set the shipping rate based on the selected country
-        shippingRate = shippingRates[customer_country] || 'worldwide_shipping_rate_id'; // Default to worldwide rate if country not listed
+        // Default shipping rate if country is not listed
+        const defaultShippingRate = 'shr_defaultWorldwideRateID';
 
-        // Log the country and selected shipping rate
+        // Set the shipping rate based on the selected country
+        const shippingRate = shippingRates[customer_country] || defaultShippingRate;
+
+        // Log the selected country and corresponding shipping rate
         console.log('Customer country:', customer_country);
         console.log('Selected shipping rate ID:', shippingRate);
 
+        // Create Stripe Checkout session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: line_items,
             mode: 'payment',
             shipping_address_collection: {
-                allowed_countries: Object.keys(shippingRates) // Allow listed countries for shipping
+                allowed_countries: Object.keys(shippingRates) // Only allow countries in the shipping rates list
             },
             shipping_options: [{ shipping_rate: shippingRate }],
             success_url: `${process.env.YOUR_DOMAIN}/vielen-dank-email`,
