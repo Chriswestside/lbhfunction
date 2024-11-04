@@ -55,7 +55,7 @@ exports.handler = async function (event, context) {
                 allowed_countries: [customer_country]
             },
             shipping_options: [{ shipping_rate: shippingRate }],
-            success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
+            success_url: `${process.env.YOUR_DOMAIN}/vielen-dank-email`,
             cancel_url: `${process.env.YOUR_DOMAIN}/kochbuch`,
             metadata: {
                 language: language // Store selected language in metadata
