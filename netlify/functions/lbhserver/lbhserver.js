@@ -60,7 +60,10 @@ exports.handler = async function (event, context) {
             },
             shipping_options: [{ shipping_rate: shippingRate }], // Only one shipping option for the selected country
             success_url: `${process.env.YOUR_DOMAIN}/thank-you`,
-            cancel_url: `${process.env.YOUR_DOMAIN}/kochbuch`
+            cancel_url: `${process.env.YOUR_DOMAIN}/kochbuch`,
+            metadata: {
+                language: language // Store selected language in metadata
+            }
         });
 
         console.log('Session created:', session);
