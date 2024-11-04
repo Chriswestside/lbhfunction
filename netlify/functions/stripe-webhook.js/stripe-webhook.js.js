@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
 
         if (memberstackPlanId && userEmail) {
             try {
-                const memberstackResponse = await fetch(`https://api.memberstack.com/v1/members`, {
+                const memberstackResponse = await fetch(`https://api.memberstack.com/v2/members`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
