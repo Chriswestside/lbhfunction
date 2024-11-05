@@ -39,7 +39,7 @@ exports.handler = async function (event, context) {
             },
             shipping_options: [{ shipping_rate: shippingRate }],
             success_url: `${process.env.YOUR_DOMAIN}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.YOUR_DOMAIN}/kochbuch`,
+            cancel_url: `${process.env.YOUR_DOMAIN}/produkte`,
             metadata: {
                 language: language,
                 memberstack_plan_id: memberstack_plan_id
